@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تحكم البوتات — Prime</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+body{background:radial-gradient(ellipse at top,#1a1f0e 0%,#0a0c06 60%);color:#e8f0d8;min-height:100vh}
+.glass{background:rgba(20,26,12,.85);backdrop-filter:blur(14px);border:1px solid rgba(139,195,74,.2)}
+.grad{background:linear-gradient(90deg,#9CCC65,#C0CA33);-webkit-background-clip:text;background-clip:text;color:transparent}
+.grad-btn{background:linear-gradient(90deg,#558B2F,#8BC34A);color:#0d1505;border:none;cursor:pointer;transition:.2s;font-weight:700}
+.grad-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(139,195,74,.4)}
+.blue-btn{background:linear-gradient(90deg,#2563eb,#3b82f6);color:#fff;border:none;cursor:pointer;transition:.2s;font-weight:700}
+.blue-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(59,130,246,.4)}
+.inp{width:100%;padding:11px 14px;border-radius:10px;border:1px solid rgba(139,195,74,.25);background:rgba(10,14,6,.9);color:#e8f0d8;font-size:13px;outline:none;margin-bottom:10px}
+.inp:focus{border-color:#8BC34A}
+select.inp{cursor:pointer}
+.lbl{font-size:12px;color:#AED581;display:block;margin-bottom:5px;font-weight:600}
+.card{border-radius:14px;padding:18px;margin-bottom:14px}
+.tab-active{background:linear-gradient(90deg,#558B2F,#8BC34A)!important;color:#0d1505!important;font-weight:800!important}
+.sub-active{background:rgba(139,195,74,.2)!important;color:#AED581!important;border-color:#8BC34A!important;font-weight:700!important}
+.tgl{position:relative;width:42px;height:22px;border-radius:20px;background:#2e3a1c;cursor:pointer;transition:.2s;flex-shrink:0;display:inline-block}
+.tgl.on{background:#8BC34A}.tgl::after{content:'';position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}.tgl.on::after{right:22px}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:#558B2F;border-radius:8px}
+.badge{padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block}
+.badge-on{background:rgba(139,195,74,.2);color:#AED581}
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;border-radius:14px;margin-bottom:14px}
+.topbar .spacer{margin-right:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-btn{padding:7px 14px;border-radius:9px;border:1px solid rgba(139,195,74,.4);background:rgba(139,195,74,.1);color:#AED581;font-size:12px;font-weight:600;cursor:pointer}
+.logout-btn{padding:7px 14px;border-radius:9px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#f87171;font-size:12px;font-weight:600;cursor:pointer}
+.main-tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px}
+.main-tab{padding:12px;border-radius:10px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#cbd5e1;font-size:13px;cursor:pointer;font-weight:600}
+.sub-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.sub-tab{padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer}
+.prot-card{padding:12px;border-radius:10px;border:1px solid rgba(139,195,74,.2);background:rgba(10,14,6,.5);margin-bottom:10px}
+.prot-card.danger{border-color:rgba(239,68,68,.25);background:rgba(40,10,10,.4)}
+.prot-card.critical{border-color:rgba(239,68,68,.35);background:rgba(50,8,8,.5)}
+.cat-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.cat-row .inp{margin-bottom:0;flex:1;min-width:100px}
+.cmd-help{background:rgba(139,195,74,.06);border:1px solid rgba(139,195,74,.2);border-radius:9px;padding:12px;margin-bottom:12px;font-size:12px;line-height:1.9}
+.cmd-help code{background:rgba(10,14,6,.9);padding:2px 7px;border-radius:5px;color:#8BC34A;font-family:monospace}
+.empty{text-align:center;padding:30px;color:#6b7a55;font-size:13px}
+.selector-box{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:600px){.selector-box{grid-template-columns:1fr}}
+.bot-item{padding:14px;border-radius:10px;border:1px solid rgba(139,195,74,.2);background:rgba(10,14,6,.6);margin-bottom:10px;cursor:pointer;transition:.2s;display:flex;justify-content:space-between;align-items:center}
+.bot-item:hover{border-color:#8BC34A;background:rgba(139,195,74,.1)}
+.running-badge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;background:#dcfce7;color:#16a34a}
+.stopped-badge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;background:#fee2e2;color:#dc2626}
+.section-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.section-actions button{padding:11px 24px;border-radius:10px;font-size:14px}
+.duration-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px}
+.duration-item label{display:block;font-size:11px;font-weight:600;color:#6b7a55;margin-bottom:4px;text-align:center}
+.duration-item input{width:100%;padding:9px;border:1px solid rgba(139,195,74,.25);border-radius:8px;background:rgba(10,14,6,.9);color:#e8f0d8;font-size:14px;text-align:center}
+</style>
+</head>
+<body>
+<div style="max-width:1150px;margin:0 auto;padding:16px">
+  <div class="glass topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#558B2F,#8BC34A);display:flex;align-items:center;justify-content:center;font-weight:800;color:#0d1505">P</div>
+      <span style="font-weight:800;font-size:16px" class="grad">Prime website</span>
+    </div>
+    <div class="spacer">
+      <span class="badge badge-on">عضو</span>
+      <span style="font-size:12px;color:#AED581" id="userName"></span>
+      <button class="nav-btn" onclick="window.location.href='support.html'">💬 الدعم الفني</button>
+      <button class="logout-btn" onclick="logout()">خروج</button>
+    </div>
+  </div>
+
+  <div class="main-tabs">
+    <button class="main-tab tab-active" onclick="switchMain('hosting',this)">🚀 استضافة البوت</button>
+    <button class="main-tab" onclick="switchMain('discord',this)">⚙️ إعدادات الديسكورد</button>
+  </div>
+
+  <!-- استضافة البوت -->
+  <div id="main-hosting">
+    <div class="glass card">
+      <h3 style="margin:0 0 14px;font-size:16px;color:#AED581">إضافة بوت جديد — يعمل فوراً بدون وضع تجريبي</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;flex-wrap:wrap">
+        <input id="botName" class="inp" placeholder="اسم البوت" style="margin-bottom:0"/>
+        <input id="botToken" type="password" class="inp" placeholder="توكن البوت (Token)" style="margin-bottom:0;font-family:monospace"/>
+        <button class="grad-btn" onclick="startBot()" style="padding:11px 22px;border-radius:10px;white-space:nowrap">تشغيل فوري</button>
+      </div>
+    </div>
+    <div class="glass card">
+      <h3 style="margin:0 0 14px;font-size:16px;color:#AED581">بوتاتي</h3>
+      <div id="botsList"><div class="empty">لا توجد بوتات — أضف أول بوت لك.</div></div>
+    </div>
+  </div>
+
+  <!-- إعدادات الديسكورد -->
+  <div id="main-discord" style="display:none">
+    <!-- اختيار البوت والسيرفر فوق -->
+    <div class="glass card">
+      <div class="selector-box">
+        <div>
+          <label class="lbl">🤖 الخطوة 1: اختر البوت</label>
+          <select id="botSelect" class="inp" onchange="onBotChange()">
+            <option value="">-- اختر بوت --</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">🏰 الخطوة 2: اختر السيرفر</label>
+          <select id="guildSelect" class="inp" onchange="onGuildChange()">
+            <option value="">-- اختر سيرفر --</option>
+          </select>
+        </div>
+      </div>
+      <div id="channelHint" style="font-size:12px;color:#6b7a55;display:none">✅ تم اختيار السيرفر — ستظهر روماته في كل قسم بالأسفل</div>
+    </div>
+
+    <!-- 14 قسم إعدادات -->
+    <div class="sub-tabs">
+      <button class="sub-tab sub-active" onclick="switchSub('welcome',this)">👋 الترحيب</button>
+      <button class="sub-tab" onclick="switchSub('automod',this)">🛡️ الحماية</button>
+      <button class="sub-tab" onclick="switchSub('tickets',this)">🎫 التذاكر</button>
+      <button class="sub-tab" onclick="switchSub('applications',this)">📋 التقديمات</button>
+      <button class="sub-tab" onclick="switchSub('levels',this)">📊 المستويات</button>
+      <button class="sub-tab" onclick="switchSub('logs',this)">📋 السجلات</button>
+      <button class="sub-tab" onclick="switchSub('admin',this)">⚔️ أوامر إدارية</button>
+      <button class="sub-tab" onclick="switchSub('reaction',this)">🔘 أدوار تفاعلية</button>
+      <button class="sub-tab" onclick="switchSub('commands',this)">⌨️ أوامر مخصصة</button>
+      <button class="sub-tab" onclick="switchSub('embed',this)">📝 الإيمبد</button>
+      <button class="sub-tab" onclick="switchSub('autorole',this)">🔁 أوتو رول</button>
+      <button class="sub-tab" onclick="switchSub('autoreply',this)">🤖 ردود تلقائية</button>
+      <button class="sub-tab" onclick="switchSub('welcomeleave',this)">👋 ترحيب ومغادرة</button>
+      <button class="sub-tab"       <button class="sub-tab" data-s="verification" onclick="switchSub('verification',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">🔐 التحقق</button>
+      <button class="sub-tab" data-s="warns" onclick="switchSub('warns',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">⚠️ التحذيرات</button>
+      <button class="sub-tab" data-s="points" onclick="switchSub('points',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">💰 نقاط واقتصاد</button>
+      <button class="sub-tab" data-s="tempvc" onclick="switchSub('tempvc',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">🔊 رومات مؤقتة</button>
+      <button class="sub-tab" data-s="stats" onclick="switchSub('stats',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">📈 إحصائيات</button>
+      <button class="sub-tab" data-s="suggestions" onclick="switchSub('suggestions',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">💡 اقتراحات</button>
+      <button class="sub-tab" data-s="announcements" onclick="switchSub('announcements',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">📢 إعلانات</button>
+      <button class="sub-tab" data-s="reminders" onclick="switchSub('reminders',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">⏰ تذكيرات</button>
+      <button class="sub-tab" data-s="bannedwords" onclick="switchSub('bannedwords',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">🚫 كلمات ممنوعة</button>
+      <button class="sub-tab" data-s="notifyroles" onclick="switchSub('notifyroles',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">🔔 ردود إخبارية</button>
+      <button class="sub-tab" data-s="rules" onclick="switchSub('rules',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">📜 القوانين</button>
+      <button class="sub-tab" data-s="giveaways" onclick="switchSub('giveaways',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">🎁 مسابقات</button>
+      <button class="sub-tab" data-s="copymsgs" onclick="switchSub('copymsgs',this)" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(139,195,74,.3);background:rgba(10,14,6,.8);color:#6b7a55;font-size:12px;cursor:pointer;">📑 نسخ رسائل</button>
+      onclick="switchSub('giveaway',this)">🎁 سحب وهدايا</button>
+    </div>
+
+    <!-- 1. الترحيب -->
+    <div id="sub-welcome" class="glass card">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">👋 إعدادات الترحيب</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px">تفعيل رسائل الترحيب</span></div>
+      <label class="lbl">روم الترحيب</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">رسالة الترحيب (استخدم {user} و {server})</label>
+      <textarea class="inp" rows="2" placeholder="مرحباً بك {user} في {server}!" style="resize:vertical"></textarea>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم حفظ إعدادات الترحيب')">💾 حفظ</button>
+        <button class="blue-btn" onclick="toast('📤 تم إرسال رسالة الترحيب')">📤 إرسال الآن</button>
+      </div>
+    </div>
+
+    <!-- 2. الحماية -->
+    <div id="sub-automod" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🛡️ إعدادات الحماية المتقدمة</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:14px;font-weight:700">تفعيل الحماية الكاملة</span></div>
+      <label class="lbl">📢 روم تنبيهات الحماية</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <div style="margin:16px 0 10px;padding:10px;background:rgba(139,195,74,.08);border-radius:8px;border:1px solid rgba(139,195,74,.2)">
+        <div style="font-size:13px;font-weight:700;color:#AED581;margin-bottom:8px">⭐ الرتب المستثناة (3 رتب)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <select class="inp"><option>رتبة 1</option></select>
+          <select class="inp"><option>رتبة 2</option></select>
+          <select class="inp"><option>رتبة 3</option></select>
+        </div>
+      </div>
+      <div class="prot-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:700">🔗 منع الروابط</span><span class="tgl on" onclick="this.classList.toggle('on')"></span></div><div style="display:grid;grid-template-columns:1fr 80px;gap:8px"><select class="inp"><option>كتم</option><option>طرد</option><option>حظر</option></select><input type="number" class="inp" value="10" min="1" placeholder="دقائق"/></div></div>
+      <div class="prot-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:700">📨 منع السبام والتكرار</span><span class="tgl on" onclick="this.classList.toggle('on')"></span></div><div style="display:grid;grid-template-columns:1fr 80px;gap:8px"><select class="inp"><option>كتم</option><option>طرد</option><option>حظر</option></select><input type="number" class="inp" value="10" min="1" placeholder="دقائق"/></div></div>
+      <div class="prot-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:700">🤬 منع السب</span><span class="tgl on" onclick="this.classList.toggle('on')"></span></div><input class="inp" placeholder="الكلمات المحظورة (افصل بفاصلة)"/><div style="display:grid;grid-template-columns:1fr 80px;gap:8px"><select class="inp"><option>كتم</option><option>طرد</option><option>حظر</option></select><input type="number" class="inp" value="10" min="1" placeholder="دقائق"/></div></div>
+      <div class="prot-card danger"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:700">👢 حماية طرد الأعضاء</span><span class="tgl" onclick="this.classList.toggle('on')"></span></div><div style="display:grid;grid-template-columns:1fr 80px;gap:8px"><select class="inp"><option>كتم</option><option>طرد</option><option selected>حظر</option></select><input type="number" class="inp" value="60" min="1" placeholder="دقائق"/></div></div>
+      <div class="prot-card danger"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:700">🤖 حماية دخول البوتات</span><span class="tgl" onclick="this.classList.toggle('on')"></span></div><div style="display:grid;grid-template-columns:1fr 80px;gap:8px"><select class="inp"><option>كتم</option><option>طرد</option><option selected>حظر</option></select><input type="number" class="inp" value="60" min="1" placeholder="دقائق"/></div></div>
+      <div class="prot-card critical"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:700">🚨 حماية التهكير</span><span class="tgl" onclick="this.classList.toggle('on')"></span></div><div style="display:grid;grid-template-columns:1fr 80px 80px;gap:8px"><select class="inp"><option>كتم</option><option>طرد</option><option selected>حظر فوري</option></select><input type="number" class="inp" value="60" min="1" placeholder="دقائق"/><input type="number" class="inp" value="3" min="2" max="20" placeholder="عدد الأحداث"/></div></div>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم حفظ إعدادات الحماية')" style="width:100%">💾 حفظ إعدادات الحماية</button>
+      </div>
+    </div>
+
+    <!-- 3. التذاكر -->
+    <div id="sub-tickets" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🎫 إنشاء لوحة تذاكر</h3>
+      <label class="lbl">روم إرسال اللوحة</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">قسم فتح التذاكر</label>
+      <select class="inp"><option>-- بدون قسم --</option><option>التذاكر</option></select>
+      <label class="lbl">عنوان اللوحة</label><input class="inp" placeholder="نظام التذاكر"/>
+      <label class="lbl">وصف اللوحة</label><textarea class="inp" rows="2" placeholder="اختر نوع التذكرة..." style="resize:vertical"></textarea>
+      <label class="lbl">الرتبة المذكورة عند فتح التذكرة</label><select class="inp"><option>-- لا توجد --</option><option>الدعم الفني</option></select>
+      <label class="lbl">شكل لوحة التذاكر</label><select class="inp" style="margin-bottom:12px"><option>قائمة منسدلة</option><option>أزرار</option></select>
+      <label class="lbl">أنواع التذاكر</label>
+      <div id="catList"><div class="cat-row"><input class="inp" placeholder="الاسم"/><input class="inp" placeholder="وصف"/><button onclick="this.parentElement.remove()" style="padding:0 14px;border-radius:8px;border:1px solid rgba(239,68,68,.4);background:transparent;color:#f87171;cursor:pointer">✕</button></div></div>
+      <button onclick="addCatRow()" style="width:100%;padding:9px;border-radius:9px;border:1px dashed rgba(139,195,74,.4);background:transparent;color:#AED581;font-size:12px;cursor:pointer;margin-bottom:12px">+ إضافة نوع تذكرة</button>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم الحفظ')">💾 حفظ</button>
+        <button class="blue-btn" onclick="toast('📤 تم إرسال اللوحة للسيرفر')">📤 إرسال اللوحة للسيرفر</button>
+      </div>
+    </div>
+
+    <!-- 4. التقديمات -->
+    <div id="sub-applications" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">📋 نظام التقديمات</h3>
+      <label class="lbl">عنوان التقديم</label><input class="inp" placeholder="مثال: تقديم إداري"/>
+      <label class="lbl">روم استلام التقديمات</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">الرتبة الممنوحة عند القبول</label><select class="inp"><option>-- اختر رتبة --</option><option>إداري</option></select>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم حفظ التقديم')">💾 حفظ</button>
+        <button class="blue-btn" onclick="toast('📤 تم إرسال نموذج التقديم')">📤 إرسال النموذج</button>
+      </div>
+    </div>
+
+    <!-- 5. المستويات -->
+    <div id="sub-levels" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">📊 المستويات والنقاط</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px">تفعيل نظام المستويات</span></div>
+      <label class="lbl">روم إعلانات الترقية</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">نقاط لكل رسالة</label><input class="inp" type="number" value="10"/>
+      <label class="lbl">رسالة الترقية</label><textarea class="inp" rows="2" placeholder="مبروك {user} وصلت للمستوى {level}!" style="resize:vertical"></textarea>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم حفظ المستويات')">💾 حفظ</button>
+      </div>
+    </div>
+
+    <!-- 6. السجلات -->
+    <div id="sub-logs" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">📋 إعدادات السجلات</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px">تفعيل السجلات</span></div>
+      <label class="lbl">📝 روم سجلات الرسائل</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">🚪 روم سجلات الدخول والخروج</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">🔨 روم سجلات الطرد والحظر</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم حفظ السجلات')">💾 حفظ السجلات</button>
+      </div>
+    </div>
+
+    <!-- 7. أوامر إدارية -->
+    <div id="sub-admin" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">⚔️ الأوامر الإدارية</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px">تفعيل الأوامر الإدارية</span></div>
+      <label class="lbl">روم تنفيذ الأوامر (اختياري)</label>
+      <select class="inp channel-select"><option>-- كل الرومات --</option></select>
+      <div class="cmd-help"><b style="color:#AED581">طريقة الاستخدام:</b><br><code>ط @العضو</code> طرد — <code>ب @العضو</code> حظر — <code>مسح 20</code> مسح رسائل — <code>كتم @العضو 10</code> كتم 10 دقائق</div>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم تفعيل الأوامر الإدارية')" style="width:100%">💾 حفظ وتفعيل الأوامر</button>
+      </div>
+    </div>
+
+    <!-- 8. أدوار تفاعلية -->
+    <div id="sub-reaction" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🔘 الأدوار التفاعلية</h3>
+      <label class="lbl">روم الرسالة</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">نص الرسالة</label><textarea class="inp" rows="2" placeholder="اختر رتبتك..." style="resize:vertical"></textarea>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم الحفظ')">💾 حفظ</button>
+        <button class="blue-btn" onclick="toast('📤 تم إرسال الرسالة')">📤 إرسال الرسالة</button>
+      </div>
+    </div>
+
+    <!-- 9. أوامر مخصصة -->
+    <div id="sub-commands" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">⌨️ الأوامر المخصصة</h3>
+      <label class="lbl">الأمر</label><input class="inp" placeholder="مثال: رابط"/>
+      <label class="lbl">الرد</label><textarea class="inp" rows="2" placeholder="الرد..."></textarea>
+      <label class="lbl">روم تنفيذ الأمر (اختياري)</label>
+      <select class="inp channel-select"><option>-- كل الرومات --</option></select>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم حفظ الأمر')" style="width:100%">💾 حفظ الأمر</button>
+      </div>
+    </div>
+
+    <!-- 10. الإيمبد -->
+    <div id="sub-embed" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">📝 صانع الإيمبد</h3>
+      <label class="lbl">روم الإرسال</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">العنوان</label><input class="inp" placeholder="عنوان الإيمبد"/>
+      <label class="lbl">الوصف</label><textarea class="inp" rows="3" placeholder="نص الإيمبد..." style="resize:vertical"></textarea>
+      <label class="lbl">لون الإيمبد (Hex)</label><input class="inp" placeholder="#558B2F" style="font-family:monospace"/>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم الحفظ')">💾 حفظ</button>
+        <button class="blue-btn" onclick="toast('📤 تم إرسال الإيمبد')">📤 إرسال الآن</button>
+      </div>
+    </div>
+
+    <!-- 11. أوتو رول -->
+    <div id="sub-autorole" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🔁 الأوتو رول</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px">تفعيل الرتبة التلقائية</span></div>
+      <label class="lbl">الرتبة التي تُعطى تلقائياً</label><select class="inp"><option>-- اختر رتبة --</option><option>عضو</option><option>زائر</option></select>
+      <label class="lbl">روم إشعار منح الرتبة (اختياري)</label>
+      <select class="inp channel-select"><option>-- لا يوجد --</option></select>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم حفظ الأوتو رول')">💾 حفظ الأوتو رول</button>
+      </div>
+    </div>
+
+    <!-- 12. ردود تلقائية -->
+    <div id="sub-autoreply" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🤖 الردود التلقائية</h3>
+      <label class="lbl">الكلمة المفتاحية</label><input class="inp" placeholder="مثال: السلام عليكم"/>
+      <label class="lbl">الرد التلقائي</label><textarea class="inp" rows="2" placeholder="وعليكم السلام!"></textarea>
+      <label class="lbl">روم تفعيل الرد (اختياري)</label>
+      <select class="inp channel-select"><option>-- كل الرومات --</option></select>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم إضافة الرد التلقائي')" style="width:100%">💾 إضافة رد تلقائي</button>
+      </div>
+    </div>
+
+    <!-- 13. ترحيب ومغادرة -->
+    <div id="sub-welcomeleave" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">👋 رسائل الترحيب والمغادرة</h3>
+      <label class="lbl">روم رسائل الدخول</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">روم رسائل الخروج</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">رسالة الدخول</label><textarea class="inp" rows="2" placeholder="مرحباً {user}!" style="resize:vertical"></textarea>
+      <label class="lbl">رسالة الخروج</label><textarea class="inp" rows="2" placeholder="إلى اللقاء {user}" style="resize:vertical"></textarea>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم الحفظ')">💾 حفظ</button>
+      </div>
+    </div>
+
+    <div id="sub-verification" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🔐 نظام التحقق (رد فعل يعطي رتبة)</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم التحقق</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">الرتبة المعطاة عند التحقق</label><select class="inp"><option>-- اختر رتبة --</option></select>      <label class="lbl">الإيموجي</label><input class="inp" value="✅"/>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-warns" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">⚠️ نظام التحذيرات (مع إجراء تلقائي)</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم سجل التحذيرات</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">حد التحذيرات قبل الإجراء</label><input class="inp" type="number" value="3"/>      <label class="lbl">الإجراء عند الوصول للحد</label><select class="inp"><option>كتم</option><option>طرد</option><option selected>حظر</option></select>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-points" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">💰 نظام النقاط والاقتصاد</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">نقاط لكل رسالة</label><input class="inp" type="number" value="1"/>      <label class="lbl">نقاط لكل دقيقة صوت</label><input class="inp" type="number" value="2"/>      <label class="lbl">روم لوحة المتصدرين</label><select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-tempvc" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🔊 الرومات المؤقتة</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم الانضمام</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">قسم إنشاء الرومات</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">حد الأعضاء</label><input class="inp" type="number" value="5"/>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-stats" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">📈 إحصائيات السيرفر</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم عداد الأعضاء</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">روم عداد المتصلين</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">روم عداد البوتات</label><select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-suggestions" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">💡 اقتراحات الأعضاء</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم الاقتراحات</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">روم المقبولة</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">إيموجي الموافقة</label><input class="inp" value="✅"/>      <label class="lbl">إيموجي الرفض</label><input class="inp" value="❌"/>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-announcements" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">📢 نظام الإعلانات</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم الإعلانات</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">الرتبة المذكورة</label><select class="inp"><option>-- اختر رتبة --</option></select>      <label class="lbl">نص الإعلان</label><textarea class="inp" rows="3" style="resize:vertical;"></textarea>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-reminders" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">⏰ التذكيرات التلقائية</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم التذكير</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">مدة التكرار بالساعات</label><input class="inp" type="number" value="24"/>      <label class="lbl">رسالة التذكير</label><textarea class="inp" rows="2" style="resize:vertical;"></textarea>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-bannedwords" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🚫 الكلمات الممنوعة</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">الكلمات الممنوعة (افصل بفاصلة)</label><textarea class="inp" rows="2" style="resize:vertical;"></textarea>      <label class="lbl">الإجراء</label><select class="inp"><option>حذف فقط</option><option>حذف + تحذير</option><option>حذف + كتم</option></select>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-notifyroles" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🔔 ردود فعل إخبارية</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم الرسالة</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">الرتبة المعطاة</label><select class="inp"><option>-- اختر رتبة --</option></select>      <label class="lbl">الإيموجي</label><input class="inp" value="🔔"/>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-rules" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">📜 قائمة القوانين</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم عرض القوانين</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">العنوان</label><input class="inp" value="قوانين السيرفر"/>      <label class="lbl">نص القوانين</label><textarea class="inp" rows="5" style="resize:vertical;"></textarea>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-giveaways" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🎁 فعاليات ومسابقات</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم المسابقة</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">الجائزة</label><input class="inp"/>      <label class="lbl">المدة بالساعات</label><input class="inp" type="number" value="24"/>      <label class="lbl">عدد الفائزين</label><input class="inp" type="number" value="1"/>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+    <div id="sub-copymsgs" class="glass card" style="display:none;">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">📑 نسخ الرسائل</h3>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="tgl on" onclick="this.classList.toggle('on')"></span><span style="font-size:13px;">تفعيل القسم</span></div>
+      <label class="lbl">روم المصدر</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">روم الهدف</label><select class="inp channel-select"><option>-- اختر روم --</option></select>      <label class="lbl">عدد الرسائل</label><input class="inp" type="number" value="50"/>
+      <div class="section-actions"><button class="grad-btn" onclick="toast('✓ تم حفظ الإعدادات')">💾 حفظ</button></div>
+    </div>
+
+        <!-- 14. سحب وهدايا -->
+    <div id="sub-giveaway" class="glass card" style="display:none">
+      <h3 style="margin:0 0 12px;font-size:15px;color:#AED581">🎁 نظام السحب والهدايا</h3>
+      <label class="lbl">روم السحب</label>
+      <select class="inp channel-select"><option>-- اختر روم --</option></select>
+      <label class="lbl">الجائزة</label><input class="inp" placeholder="مثال: نيترو شهر"/>
+      <label class="lbl">مدة السحب</label>
+      <div class="duration-grid">
+        <div class="duration-item"><label>سنين</label><input type="number" value="0" min="0"/></div>
+        <div class="duration-item"><label>أشهر</label><input type="number" value="0" min="0"/></div>
+        <div class="duration-item"><label>أيام</label><input type="number" value="1" min="0"/></div>
+        <div class="duration-item"><label>ساعات</label><input type="number" value="0" min="0"/></div>
+        <div class="duration-item"><label>دقائق</label><input type="number" value="0" min="0"/></div>
+      </div>
+      <label class="lbl">عدد الفائزين</label><input class="inp" type="number" value="1" min="1"/>
+      <div class="section-actions">
+        <button class="grad-btn" onclick="toast('✓ تم الحفظ')">💾 حفظ</button>
+        <button class="blue-btn" onclick="toast('🎁 تم بدء السحب!')">🎁 بدء السحب الآن</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+if(!localStorage.getItem("prime_token")||localStorage.getItem("prime_role")!=="user"){window.location.href="login.html?mode=user";}
+document.getElementById("userName").textContent="أهلاً بك، "+localStorage.getItem("prime_user");
+var token=localStorage.getItem("prime_token");
+var myBots=[];
+
+function toast(msg){var t=document.createElement("div");t.style.cssText="position:fixed;top:16px;left:16px;background:rgba(10,14,6,.95);border:1px solid #8BC34A;color:#e8f0d8;padding:11px 16px;border-radius:9px;font-size:12px;z-index:9999";t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.style.opacity="0";t.style.transition=".4s";setTimeout(function(){t.remove();},400);},3000);}
+async function logout(){await fetch("/api/user/logout",{method:"POST",headers:{"Authorization":"Bearer "+token}});localStorage.clear();location.href="index.html";}
+function switchMain(t,btn){document.querySelectorAll(".main-tab").forEach(function(b){b.classList.remove("tab-active");});btn.classList.add("tab-active");document.getElementById("main-hosting").style.display=t==="hosting"?"block":"none";document.getElementById("main-discord").style.display=t==="discord"?"block":"none";if(t==="discord")loadBotSelect();}
+function switchSub(s,btn){document.querySelectorAll(".sub-tab").forEach(function(b){b.classList.remove("sub-active");});btn.classList.add("sub-active");["welcome","automod","tickets","applications","levels","logs","admin","reaction","commands","embed","autorole","autoreply","welcomeleave","giveaway"].forEach(function(x){document.getElementById("sub-"+x).style.display=x===s?"block":"none";});}
+function addCatRow(){var d=document.createElement("div");d.className="cat-row";d.innerHTML='<input class="inp" placeholder="الاسم"/><input class="inp" placeholder="وصف"/><button onclick="this.parentElement.remove()" style="padding:0 14px;border-radius:8px;border:1px solid rgba(239,68,68,.4);background:transparent;color:#f87171;cursor:pointer">✕</button>';document.getElementById("catList").appendChild(d);}
+
+async function startBot(){
+  var name=document.getElementById("botName").value.trim();
+  var tok=document.getElementById("botToken").value.trim();
+  if(!name||!tok){toast("املأ الحقلين");return;}
+  var r=await fetch("/api/bot/start",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({botName:name,token:tok})});
+  var d=await r.json();
+  if(d.success){toast("✅ "+d.message);document.getElementById("botName").value="";document.getElementById("botToken").value="";loadBots();}
+  else toast(d.error||"خطأ");
+}
+async function loadBots(){
+  var r=await fetch("/api/bots",{headers:{"Authorization":"Bearer "+token}});
+  var d=await r.json();
+  myBots=d||[];
+  var box=document.getElementById("botsList");
+  if(!myBots.length){box.innerHTML='<div class="empty">لا توجد بوتات</div>';return;}
+  box.innerHTML=myBots.map(function(b){
+    return '<div class="bot-item"><span style="font-weight:700">🤖 '+b.name+'</span><span class="'+(b.running?'running-badge':'stopped-badge')+'">'+(b.running?'يعمل':'متوقف')+'</span></div>';
+  }).join("");
+}
+function loadBotSelect(){
+  var sel=document.getElementById("botSelect");
+  sel.innerHTML='<option value="">-- اختر بوت --</option>'+myBots.map(function(b){return '<option value="'+b.name+'">'+b.name+'</option>';}).join("");
+}
+function onBotChange(){
+  var botName=document.getElementById("botSelect").value;
+  var gsel=document.getElementById("guildSelect");
+  if(!botName){gsel.innerHTML='<option value="">-- اختر سيرفر --</option>';document.getElementById("channelHint").style.display="none";return;}
+  var bot=myBots.find(function(b){return b.name===botName;});
+  var guilds=(bot&&bot.guilds&&bot.guilds.length)?bot.guilds:[{id:"g1",name:"سيرفر تجريبي",channels:[{id:"c1",name:"عام"},{id:"c2",name:"الترحيب"},{id:"c3",name:"السجلات"},{id:"c4",name:"الدعم"},{id:"c5",name:"الإعلانات"}]}];
+  gsel.innerHTML='<option value="">-- اختر سيرفر --</option>'+guilds.map(function(g){return '<option value="'+g.id+'">'+g.name+'</option>';}).join("");
+  gsel.dataset.channels=JSON.stringify(guilds);
+  document.getElementById("channelHint").style.display="none";
+}
+function onGuildChange(){
+  var guildId=document.getElementById("guildSelect").value;
+  if(!guildId){document.getElementById("channelHint").style.display="none";return;}
+  var guilds=JSON.parse(document.getElementById("guildSelect").dataset.channels||"[]");
+  var guild=guilds.find(function(g){return g.id===guildId;});
+  var channels=(guild&&guilds.length)?guild.channels:[{id:"c1",name:"عام"},{id:"c2",name:"الترحيب"},{id:"c3",name:"السجلات"}];
+  // تعبئة كل قوائم الرومات في كل الأقسام
+  document.querySelectorAll(".channel-select").forEach(function(sel){
+    var first=sel.options[0].text;
+    sel.innerHTML='<option value="">'+first+'</option>'+channels.map(function(c){return '<option value="'+c.id+'">#'+c.name+'</option>';}).join("");
+  });
+  document.getElementById("channelHint").style.display="block";
+  toast("✅ تم تحميل رومات السيرفر في كل الأقسام");
+}
+loadBots();
+</script>
+</body>
+</html>
